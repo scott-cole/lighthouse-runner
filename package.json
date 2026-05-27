@@ -1,0 +1,19 @@
+{
+  "name": "lighthouse-runner",
+  "version": "1.0.0",
+  "description": "Crawl a site and run Lighthouse on every page",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "lhr": "./index.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "lighthouse": "^12.0.0",
+    "node-fetch": "^3.3.2",
+    "ora": "^8.0.1",
+    "p-limit": "^5.0.0",
+    "puppeteer": "^24.43.1"
+  }
+}
