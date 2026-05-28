@@ -16,7 +16,6 @@ export async function crawl(baseUrl) {
     const homeResponse = await fetch(baseUrl);
     const html = await homeResponse.text();
     const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
-    console.log("Found " + hrefs.length + " links", hrefs);
 
     const baseHost = new URL(baseUrl).hostname;
     const internalUrls = new Set();

@@ -1,6 +1,10 @@
+import pLimit from "p-limit";
+import { crawl } from "./crawl.js";
+import { runLighthouse } from "./scanner.js";
+import { printResults } from "./display.js";
+
 function parseArgs(raw) {
   const args = raw.slice(2);
-  console.log("Args", args);
 
   let url = null;
   let concurrency = 3;
@@ -23,4 +27,27 @@ function parseArgs(raw) {
   return { url, concurrency, showAll };
 }
 
-console.log(parseArgs(process.argv));
+export async function main() {
+  const flags = parseArgs(process.argv);
+  let url = flags.url;
+  if (!url) {
+    console.log("no url entered");
+    return;
+  }
+
+  if (!url.startsWith("http")) url = "https://" + url;
+
+  const urls = await crawl(url);
+  if (urls.length === 0) {
+    console.log("No pages found to scan");
+    return;
+  }
+
+  const limit = pLimit(flags.concurrency);
+  const tasks = urls.map((u) => limit(() => runLighthouse(u)));
+  const results = await Promise.all(tasks);
+
+  printResults(results);
+}
+
+main();
