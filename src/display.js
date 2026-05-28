@@ -45,40 +45,42 @@ export function printResults(results) {
 
   console.log(table.toString());
 
-  if (success.length > 0) {
-    console.log("\n ── Performance Scores ──");
+  function printCategoryBars(label, getScore) {
+    console.log("\n ── " + label + " ──");
     for (const r of success) {
-      const blocks = Math.round(r.scores.performance / 5);
+      const score = getScore(r);
+      const blocks = Math.round(score / 5);
       const emptyBlocks = 20 - blocks;
-      const bar = "█".repeat(blocks) + "░".repeat(emptyBlocks);
       let color;
 
-      if (r.scores.performance >= 90) {
-        color = chalk.green;
-      } else if (r.scores.performance >= 80) {
-        color = chalk.blue;
-      } else if (r.scores.performance >= 70) {
-        color = chalk.yellow;
-      } else color = chalk.red;
+      if (score >= 90) color = chalk.green;
+      else if (score >= 80) color = chalk.blue;
+      else if (score >= 70) color = chalk.yellow;
+      else color = chalk.red;
 
       console.log(
-        "  " + color(bar) + " " + r.scores.performance + "%  " + r.url,
+        "  " + color("█".repeat(blocks) + "░".repeat(emptyBlocks)) + " " + score + "%  " + r.url,
       );
     }
   }
 
+  if (success.length > 0) {
+    printCategoryBars("Performance Scores", (r) => r.scores.performance);
+    printCategoryBars("Accessibility Scores", (r) => r.scores.accessibility);
+    printCategoryBars("Best Practices Scores", (r) => r.scores["best-practices"]);
+    printCategoryBars("SEO Scores", (r) => r.scores.seo);
+  }
+
+  function avgBar(value) {
+    const filled = Math.round(value / 5);
+    return "█".repeat(filled) + "░".repeat(20 - filled);
+  }
+
   console.log("\n ── Averages ──");
-  console.log(
-    "  " +
-      "█".repeat(Math.round(avgPerf / 5)) +
-      "░".repeat(20 - Math.round(avgPerf / 5)) +
-      " " +
-      avgPerf +
-      "%  Performance",
-  );
-  console.log("  " + avgA11y + "%  Accessibility");
-  console.log("  " + avgBp + "%  Best Practices");
-  console.log("  " + avgSeo + "%  SEO");
+  console.log("  " + avgBar(avgPerf) + " " + avgPerf + "%  Performance");
+  console.log("  " + avgBar(avgA11y) + " " + avgA11y + "%  Accessibility");
+  console.log("  " + avgBar(avgBp) + " " + avgBp + "%  Best Practices");
+  console.log("  " + avgBar(avgSeo) + " " + avgSeo + "%  SEO");
 
   if (failed.length > 0) {
     console.log("\n ── " + failed.length + " Failed ──");
