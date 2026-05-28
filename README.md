@@ -29,6 +29,35 @@ node index.js https://example.com -c 5 --all
 2. **Scan** — launches headless Chromium (via Puppeteer) and runs Lighthouse on each page
 3. **Display** — prints a table, bar charts, category averages, and any failures
 
+## Example output
+
+```
+  ⚡ Lighthouse Site Scanner
+ 28/05/2026, 08:30:00
+ https://example.com
+
+- Discovering pages...
+✔ Discovered 3 pages
+- Scanning 0/3
+✔ Completed 3/3 scans
+┌──────────────────────┬───────┬──────┬──────┬────┬─────┬──────┬─────┬──────┐
+│ URL                  │ Score │ Perf │ A11y │ BP │ SEO │ LCP  │ TBT │ CLS  │
+├──────────────────────┼───────┼──────┼──────┼────┼─────┼──────┼─────┼──────┤
+│ /                    │ A     │ 100  │ 100  │ 93 │ 80  │ 769  │ 0   │ 0.00 │
+│ /about               │ B     │ 85   │ 92   │ 90 │ 100 │ 1200 │ 50  │ 0.02 │
+│ /contact             │ C     │ 72   │ 88   │ 78 │ 90  │ 2100 │ 180 │ 0.15 │
+└──────────────────────┴───────┴──────┴──────┴────┴─────┴──────┴─────┴──────┘
+
+  ████████████████████ 100%  /
+  █████████████████░░░ 85%   /about
+  ███████████████░░░░░ 72%   /contact
+
+  ████████████████████ 85%  Performance
+  ████████████████████ 93%  Accessibility
+  ██████████████████░░ 87%  Best Practices
+  ██████████████████░░ 90%  SEO
+```
+
 ## Install
 
 ```bash
