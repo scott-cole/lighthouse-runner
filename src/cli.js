@@ -1,4 +1,6 @@
 import pLimit from "p-limit";
+import ora from "ora";
+import chalk from "chalk";
 import { crawl } from "./crawl.js";
 import { runLighthouse } from "./scanner.js";
 import { printResults } from "./display.js";
@@ -30,14 +32,43 @@ function parseArgs(raw) {
 export async function main() {
   const flags = parseArgs(process.argv);
   let url = flags.url;
-  if (!url) {
-    console.log("no url entered");
+
+  if (!url || url === "-h" || url === "--help") {
+    console.log(`
+  ⚡ Lighthouse Site Scanner
+  Usage: node index.js <url> [options]
+
+  Options:
+    -c, --concurrency=N   Number of concurrent Lighthouse runs (default: 3)
+    -a, --all             Show all results (not just top 15)
+    -h, --help            Show this help
+`);
     return;
   }
 
   if (!url.startsWith("http")) url = "https://" + url;
 
+  const date = new Date().toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  console.log(chalk.cyan("\n  ⚡ Lighthouse Site Scanner"));
+  console.log(" " + date);
+  console.log(" " + url + "\n");
+
+  const spinner = ora({
+    text: "Discovering pages...",
+    spinner: "dots",
+  }).start();
+
   const urls = await crawl(url);
+
+  spinner.succeed("Discovered " + urls.length + " pages");
+
   if (urls.length === 0) {
     console.log("No pages found to scan");
     return;
@@ -45,9 +76,22 @@ export async function main() {
 
   const limit = pLimit(flags.concurrency);
   const tasks = urls.map((u) => limit(() => runLighthouse(u)));
-  const results = await Promise.all(tasks);
+
+  const scanSpinner = ora({
+    text: "Scanning 0/" + urls.length,
+    spinner: "dots",
+  }).start();
+  const results = [];
+
+  for (const task of tasks) {
+    const result = await task;
+    results.push(result);
+    scanSpinner.text = "Scanning " + results.length + "/" + urls.length;
+  }
+
+  scanSpinner.succeed(
+    "Completed " + results.length + "/" + urls.length + " scans",
+  );
 
   printResults(results);
 }
-
-main();
