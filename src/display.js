@@ -31,7 +31,9 @@ export function printResults(results) {
       r.scores.seo,
       fmt(r.metrics.lcp),
       fmt(r.metrics.tbt),
-      r.metrics.cls != null && !isNaN(r.metrics.cls) ? r.metrics.cls.toFixed(2) : "-",
+      r.metrics.cls != null && !isNaN(r.metrics.cls)
+        ? r.metrics.cls.toFixed(2)
+        : "-",
     ]);
   }
 
@@ -47,12 +49,15 @@ export function printResults(results) {
       else if (score >= 80) color = chalk.blue;
       else if (score >= 70) color = chalk.yellow;
       else color = chalk.red;
-      console.log("  " + color("█".repeat(blocks)) + " " + score + "%  " + r.url);
+      console.log(
+        "  " + color("█".repeat(blocks)) + " " + score + "%  " + r.url,
+      );
     }
   }
 
   const total = (key) => success.reduce((s, r) => s + r.scores[key], 0);
-  const avg = (key) => success.length ? Math.round(total(key) / success.length) : 0;
+  const avg = (key) =>
+    success.length ? Math.round(total(key) / success.length) : 0;
   const avgs = [
     ["Performance", avg("performance")],
     ["Accessibility", avg("accessibility")],
@@ -63,10 +68,19 @@ export function printResults(results) {
   console.log("");
   for (const [label, value] of avgs) {
     const filled = Math.round(value / 5);
-    console.log("  " + "█".repeat(filled) + " " + value + "%  " + label);
+    let color;
+    if (value >= 90) color = chalk.green;
+    else if (value >= 80) color = chalk.blue;
+    else if (value >= 70) color = chalk.yellow;
+    else color = chalk.red;
+    console.log("  " + color("█".repeat(filled)) + " " + value + "%  " + label);
   }
 
   if (failed.length > 0) {
-    console.log(chalk.red("\n  ✗ " + failed.length + " failed") + " — " + failed.map((r) => r.url).join(", "));
+    console.log(
+      chalk.red("\n  ✗ " + failed.length + " failed") +
+        " — " +
+        failed.map((r) => r.url).join(", "),
+    );
   }
 }
